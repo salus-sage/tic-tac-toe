@@ -1,10 +1,10 @@
 
-import React from 'react';
+import { React, useEffect, useState} from 'react';
 import "./App.css";
 
 function Board() {
-  const [cells, setCells] = React.useState(Array(9).fill(null));
-
+  const [cells, setCells] = useState(Array(9).fill(null));
+  const [winCount, setWinCount] = useState({'x': 0, 'o': 0});
   const nextValue = calculateTurn(cells);
   const winner = calculateWinner(cells);
   const status = isGameOver(winner, cells, nextValue);
@@ -31,9 +31,33 @@ function Board() {
     );
   }
 
+  useEffect(() => {
+    if(winner === 'X') {
+      setWinCount((prevState) => ({
+      ...prevState,
+      'x': prevState['x'] + 1
+    }));
+    } 
+    
+    if (winner === 'O') {
+      setWinCount((prevState) => ({
+        ...prevState,
+        'o': prevState['o'] + 1
+      }));
+    }
+  }, [winner]);
+
   return (
     <div>
       <div className="game-info">{status}</div>
+      <div className="win-count">
+        <div>
+          X wins: {winCount['x']}
+        </div>
+        <div>
+          O Wins: {winCount['o']}
+        </div>
+      </div>
       <div className="board-row">
         {renderCell(0)}
         {renderCell(1)}
@@ -69,14 +93,10 @@ function Game() {
 // Check if game over
 function isGameOver(winner, cells, nextValue) {
   //ToDo: this could be refactored
-  if(winner) {
-    return `Winner: ${winner}`;
-  }
-  if(cells.every(Boolean)) {
-    return `Oops!: Its a tie`;
-  }
-  return `Next player: ${nextValue}`;
-  
+  return winner 
+  ? `Winner: ${winner}` : cells.every(Boolean) 
+  ? `Oops!: Its a tie`: `Next player: ${nextValue}`;
+
 }
 
 //check player turn
